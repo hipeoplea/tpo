@@ -67,6 +67,11 @@ class ArctgSeriesTest {
     }
 
     @Test
+    void shouldThrowForNegativeInfinity() {
+        assertThrows(IllegalArgumentException.class, () -> ArctgSeries.arctg(Double.NEGATIVE_INFINITY, 1e-10, 100));
+    }
+
+    @Test
     void shouldPreserveNegativeZeroSignBit() {
         double actual = ArctgSeries.arctg(-0.0, 1e-10, 100);
         assertEquals(Double.doubleToRawLongBits(-0.0), Double.doubleToRawLongBits(actual));
@@ -107,6 +112,8 @@ class ArctgSeriesTest {
     void shouldThrowForAbsoluteXGreaterThanOne() {
         assertThrows(IllegalArgumentException.class, () -> ArctgSeries.arctg(1.5, 1e-10, 1000));
         assertThrows(IllegalArgumentException.class, () -> ArctgSeries.arctg(-2.0, 1e-10, 1000));
+        assertThrows(IllegalArgumentException.class, () -> ArctgSeries.arctg(1.0000001, 1e-10, 1000));
+        assertThrows(IllegalArgumentException.class, () -> ArctgSeries.arctg(-1.0000001, 1e-10, 1000));
     }
 
     @Test
