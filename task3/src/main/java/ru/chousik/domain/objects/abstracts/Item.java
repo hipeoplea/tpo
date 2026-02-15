@@ -3,6 +3,7 @@ package ru.chousik.domain.objects.abstracts;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import ru.chousik.domain.objects.Person;
 
 @Getter
 @Setter
@@ -10,4 +11,5 @@ import lombok.Setter;
 abstract public class Item {
     private String name;
     private String description;
+    private Person owner;
 }
