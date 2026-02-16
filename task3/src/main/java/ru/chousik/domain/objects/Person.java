@@ -10,7 +10,9 @@ import ru.chousik.domain.objects.abstracts.Place;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,6 +23,7 @@ public class Person {
     private List<Race> races;
     private List<Item> items;
     private Place correctPlace;
+    private final Set<Race> knownRaces;
 
     @Builder
     public Person(String firstName, String lastName,
@@ -28,17 +31,22 @@ public class Person {
                   List<Item> items) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.races = races == null ? new ArrayList<>() : races;
-        this.items = items == null ? new ArrayList<>() : items;
+        this.races = races == null ? new ArrayList<>() : new ArrayList<>(races);
+        this.items = items == null ? new ArrayList<>() : new ArrayList<>(items);
+        this.knownRaces = EnumSet.noneOf(Race.class);
+        validateCompatibility(this.races);
+        initializeKnowledge();
     }
 
-    public List<Race> racesView() {
+    public List<Race> getRaces() {
         return Collections.unmodifiableList(races);
     }
 
     public void addRace(Race race) {
         if (race != null) {
+            ensureCompatible(race);
             this.races.add(race);
+            registerKnowledgeFrom(race);
         }
     }
 
@@ -65,5 +73,39 @@ public class Person {
             }
         }
         throw new IllegalArgumentException("Предмет с таким название не найден");
+    }
+
+    private void validateCompatibility(List<Race> races) {
+        for (int i = 0; i < races.size(); i++) {
+            for (int j = i + 1; j < races.size(); j++) {
+                Race first = races.get(i);
+                Race second = races.get(j);
+                if (!first.isCompatibleWith(second)) {
+                    throw new IllegalArgumentException("Несовместимые расы: " + first + " и " + second);
+                }
+            }
+        }
+    }
+
+    private void ensureCompatible(Race race) {
+        for (Race existing : races) {
+            if (!existing.isCompatibleWith(race)) {
+                throw new IllegalArgumentException("Несовместимые расы: " + existing + " и " + race);
+            }
+        }
+    }
+
+    private void initializeKnowledge() {
+        for (Race race : races) {
+            registerKnowledgeFrom(race);
+        }
+    }
+
+    private void registerKnowledgeFrom(Race race) {
+        if (race == null) {
+            return;
+        }
+        knownRaces.add(race);
+        knownRaces.addAll(race.knownRacesView());
     }
 }

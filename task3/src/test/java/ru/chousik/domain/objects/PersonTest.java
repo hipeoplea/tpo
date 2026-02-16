@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import ru.chousik.domain.enums.Race;
 import ru.chousik.domain.interfaces.Usable;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PersonTest {
@@ -18,7 +20,7 @@ class PersonTest {
         person.addRace(Race.HUMAN);
 
         assertThrows(UnsupportedOperationException.class, () ->
-                person.racesView().add(Race.VOGON));
+                person.getRaces().add(Race.VOGON));
     }
 
     @Test
@@ -45,6 +47,7 @@ class PersonTest {
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> person.useItem("book"));
+        assertEquals("Вы не можете использовать этот предмет", exception.getMessage());
     }
 
     @Test
@@ -56,6 +59,39 @@ class PersonTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> person.useItem("unknown"));
+        assertEquals("Предмет с таким название не найден", exception.getMessage());
+    }
+
+    @Test
+    void addRaceThrowsWhenIncompatible() {
+        Person person = Person.builder()
+                .firstName("Ford")
+                .lastName("Prefect")
+                .races(List.of(Race.HUMAN))
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> person.addRace(Race.VOGON));
+    }
+
+    @Test
+    void builderThrowsWhenInitialRacesIncompatible() {
+        assertThrows(IllegalArgumentException.class, () -> Person.builder()
+                .firstName("Ford")
+                .lastName("Prefect")
+                .races(List.of(Race.HUMAN, Race.VOGON))
+                .build());
+    }
+
+    @Test
+    void knownRacesPopulatedFromRaceKnowledge() {
+        Person person = Person.builder()
+                .firstName("Ford")
+                .lastName("Prefect")
+                .races(List.of(Race.HUMAN))
+                .build();
+
+        assertTrue(person.getKnownRaces().contains(Race.HUMAN));
+        assertTrue(person.getKnownRaces().containsAll(Race.HUMAN.knownRacesView()));
     }
 
     private static class TestUsableItem extends Item implements Usable {
