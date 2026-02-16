@@ -54,16 +54,16 @@ public class Person {
 
     public void useItem(String itemName) {
         for (Item item : items) {
-            if (item.getName().equals(itemName)){
-                if (item instanceof Usable){
+            if (item.getName().equals(itemName)) {
+                if (item instanceof Usable) {
                     ((Usable) item).use();
                     System.out.printf("Вы использовали предмет %s", item.getName());
                 } else {
-                    System.out.println("Вы не можете использовать этот предмет");
+                    throw new IllegalStateException("Вы не можете использовать этот предмет");
                 }
                 return;
             }
         }
-        System.out.println("Предмет с таким название не найден");
+        throw new IllegalArgumentException("Предмет с таким название не найден");
     }
 }
