@@ -19,6 +19,9 @@ public class Cabin extends Place implements BrightnessAdjustable {
         this.occupant = occupant;
         this.lightingLevel = lightingLevel;
         this.size = size;
+        if (occupant != null) {
+            enter(occupant);
+        }
     }
 
     @Override

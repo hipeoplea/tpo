@@ -1,10 +1,13 @@
 package ru.chousik.domain.enums;
 
+import lombok.Getter;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public enum Race {
     HUMAN(false),
     VOGON(true),
@@ -39,10 +42,6 @@ public enum Race {
         UNKNOWN.knownRaces.addAll(EnumSet.of(HUMAN, VOGON, TRAALIAN, GOLGAFRINCHAMITE, MAGRATHEAN, ANDROID));
     }
 
-    public Set<Race> incompatibleRacesView() {
-        return Collections.unmodifiableSet(incompatibleRaces);
-    }
-
     public Set<Race> knownRacesView() {
         return Collections.unmodifiableSet(knownRaces);
     }
@@ -52,9 +51,5 @@ public enum Race {
             return true;
         }
         return !incompatibleRaces.contains(other) && !other.incompatibleRaces.contains(this);
-    }
-
-    public boolean isDangerous() {
-        return dangerous;
     }
 }

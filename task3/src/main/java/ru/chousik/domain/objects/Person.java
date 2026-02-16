@@ -1,5 +1,6 @@
 package ru.chousik.domain.objects;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +39,7 @@ public class Person implements Nervous {
         initializeKnowledge();
     }
 
-    public List<Race> getRaces() {
+    public List<Race> racesView() {
         return Collections.unmodifiableList(races);
     }
 
@@ -68,6 +69,9 @@ public class Person implements Nervous {
         for (Item item : items) {
             if (item.getName().equals(itemName)) {
                 if (item instanceof Usable) {
+                    if (hasThreateningCompany()) {
+                        getNervous();
+                    }
                     ((Usable) item).use();
                     System.out.printf("Вы использовали предмет %s", item.getName());
                 } else {
@@ -113,6 +117,19 @@ public class Person implements Nervous {
         knownRaces.addAll(race.knownRacesView());
     }
 
+    public void setCorrectPlace(Place newPlace) {
+        if (this.correctPlace == newPlace) {
+            return;
+        }
+        if (this.correctPlace != null) {
+            this.correctPlace.leave(this);
+        }
+        this.correctPlace = newPlace;
+        if (this.correctPlace != null) {
+            this.correctPlace.enter(this);
+        }
+    }
+
     @Override
     public boolean isNervous() {
         return nervous;
@@ -122,5 +139,22 @@ public class Person implements Nervous {
     public void getNervous() {
         this.nervous = true;
         System.out.printf("%s %s нервничает.%n", firstName, lastName);
+    }
+
+    private boolean hasThreateningCompany() {
+        if (correctPlace == null) {
+            return false;
+        }
+        for (Person neighbor : correctPlace.personsView()) {
+            if (neighbor == null || neighbor == this) {
+                continue;
+            }
+            for (Race race : neighbor.racesView()) {
+                if (race.isDangerous() || !knownRaces.contains(race)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -1,7 +1,9 @@
 package ru.chousik.domain.objects;
 
 import org.junit.jupiter.api.Test;
+import ru.chousik.domain.enums.LightingLevel;
 import ru.chousik.domain.enums.Race;
+import ru.chousik.domain.enums.Size;
 import ru.chousik.domain.interfaces.Usable;
 
 import java.util.List;
@@ -20,7 +22,7 @@ class PersonTest {
         person.addRace(Race.HUMAN);
 
         assertThrows(UnsupportedOperationException.class, () ->
-                person.getRaces().add(Race.VOGON));
+                person.racesView().add(Race.VOGON));
     }
 
     @Test
@@ -90,8 +92,54 @@ class PersonTest {
                 .races(List.of(Race.HUMAN))
                 .build();
 
-        assertTrue(person.getKnownRaces().contains(Race.HUMAN));
-        assertTrue(person.getKnownRaces().containsAll(Race.HUMAN.knownRacesView()));
+        assertTrue(person.knownRacesView().contains(Race.HUMAN));
+        assertTrue(person.knownRacesView().containsAll(Race.HUMAN.knownRacesView()));
+    }
+
+    @Test
+    void useItemMakesPersonNervousWhenDangerousRaceNearby() {
+        Person ford = Person.builder()
+                .firstName("Ford")
+                .lastName("Prefect")
+                .races(List.of(Race.HUMAN))
+                .build();
+        Person vogon = Person.builder()
+                .firstName("Prostetnic")
+                .lastName("Jeltz")
+                .races(List.of(Race.VOGON))
+                .build();
+        Cabin cabin = new Cabin("Cabin", ford, LightingLevel.DARK, Size.SMALL);
+        ford.setCorrectPlace(cabin);
+        vogon.setCorrectPlace(cabin);
+        TestUsableItem match = new TestUsableItem("match", "Simple match");
+        ford.addItem(match);
+
+        ford.useItem("match");
+
+        assertTrue(ford.isNervous());
+    }
+
+    @Test
+    void useItemMakesPersonNervousWhenRaceUnknown() {
+        Person ford = Person.builder()
+                .firstName("Ford")
+                .lastName("Prefect")
+                .races(List.of(Race.HUMAN))
+                .build();
+        Person magrathean = Person.builder()
+                .firstName("Slartibartfast")
+                .lastName("Magrathean")
+                .races(List.of(Race.MAGRATHEAN))
+                .build();
+        Cabin cabin = new Cabin("Cabin", ford, LightingLevel.DARK, Size.SMALL);
+        ford.setCorrectPlace(cabin);
+        magrathean.setCorrectPlace(cabin);
+        TestUsableItem match = new TestUsableItem("match", "Simple match");
+        ford.addItem(match);
+
+        ford.useItem("match");
+
+        assertTrue(ford.isNervous());
     }
 
     private static class TestUsableItem extends Item implements Usable {
