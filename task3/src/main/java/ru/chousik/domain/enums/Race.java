@@ -6,20 +6,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum Race {
-    HUMAN,
-    VOGON,
-    TRAALIAN,
-    GOLGAFRINCHAMITE,
-    MAGRATHEAN,
-    ANDROID,
-    UNKNOWN;
+    HUMAN(false),
+    VOGON(true),
+    TRAALIAN(true),
+    GOLGAFRINCHAMITE(false),
+    MAGRATHEAN(false),
+    ANDROID(false),
+    UNKNOWN(false);
 
     private final Set<Race> incompatibleRaces;
     private final Set<Race> knownRaces;
+    private final boolean dangerous;
 
-    Race() {
+    Race(boolean dangerous) {
         this.incompatibleRaces = new HashSet<>();
         this.knownRaces = new HashSet<>();
+        this.dangerous = dangerous;
     }
 
     static {
@@ -50,5 +52,9 @@ public enum Race {
             return true;
         }
         return !incompatibleRaces.contains(other) && !other.incompatibleRaces.contains(this);
+    }
+
+    public boolean isDangerous() {
+        return dangerous;
     }
 }

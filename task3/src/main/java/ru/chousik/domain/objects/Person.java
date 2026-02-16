@@ -3,8 +3,8 @@ package ru.chousik.domain.objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import ru.chousik.domain.enums.Race;
+import ru.chousik.domain.interfaces.Nervous;
 import ru.chousik.domain.interfaces.Usable;
 import ru.chousik.domain.objects.abstracts.Place;
 
@@ -16,14 +16,14 @@ import java.util.Set;
 
 @Getter
 @Setter
-@ToString
-public class Person {
+public class Person implements Nervous {
     private String firstName;
     private String lastName;
     private List<Race> races;
     private List<Item> items;
     private Place correctPlace;
     private final Set<Race> knownRaces;
+    private boolean nervous;
 
     @Builder
     public Person(String firstName, String lastName,
@@ -40,6 +40,10 @@ public class Person {
 
     public List<Race> getRaces() {
         return Collections.unmodifiableList(races);
+    }
+
+    public Set<Race> knownRacesView() {
+        return Collections.unmodifiableSet(knownRaces);
     }
 
     public void addRace(Race race) {
@@ -107,5 +111,16 @@ public class Person {
         }
         knownRaces.add(race);
         knownRaces.addAll(race.knownRacesView());
+    }
+
+    @Override
+    public boolean isNervous() {
+        return nervous;
+    }
+
+    @Override
+    public void getNervous() {
+        this.nervous = true;
+        System.out.printf("%s %s нервничает.%n", firstName, lastName);
     }
 }
