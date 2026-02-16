@@ -142,6 +142,29 @@ class PersonTest {
         assertTrue(ford.isNervous());
     }
 
+    @Test
+    void useItemKeepsCalmWithKnownSafeRaceNearby() {
+        Person ford = Person.builder()
+                .firstName("Ford")
+                .lastName("Prefect")
+                .races(List.of(Race.HUMAN))
+                .build();
+        Person human = Person.builder()
+                .firstName("Arthur")
+                .lastName("Dent")
+                .races(List.of(Race.HUMAN))
+                .build();
+        Cabin cabin = new Cabin("Cabin", ford, LightingLevel.DARK, Size.SMALL);
+        ford.setCorrectPlace(cabin);
+        human.setCorrectPlace(cabin);
+        TestUsableItem match = new TestUsableItem("match", "Simple match");
+        ford.addItem(match);
+
+        ford.useItem("match");
+
+        assertFalse(ford.isNervous());
+    }
+
     private static class TestUsableItem extends Item implements Usable {
         private boolean used;
 
